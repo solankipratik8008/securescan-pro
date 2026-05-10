@@ -83,3 +83,4 @@ SecureScanPro/
 │
 └── Resources/
     └── Assets.xcassets
+
