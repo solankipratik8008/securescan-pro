@@ -51,6 +51,9 @@ SecureScan Pro focuses on secure document capture and intelligent text recogniti
 ---
 
 ## Main Modules
+Images:
+
+![image alt](https://github.com/solankipratik8008/securescan-pro/blob/main/3.jpeg?raw=true)
 
 ![image alt](https://github.com/solankipratik8008/securescan-pro/blob/main/2.jpeg?raw=true)
 
