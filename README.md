@@ -90,9 +90,11 @@ The app also includes local saved scan history and CloudKit-based iCloud backup/
 
 ## Demo Video
 
-The project includes a screen recording that demonstrates the complete SecureScan Pro workflow, including document scanning, OCR extraction, privacy masking, local saved scan history, and CloudKit iCloud backup/restore.
+The project includes a short demo video showing the complete SecureScan Pro workflow, including document scanning, OCR extraction, privacy masking, local saved scan history, and CloudKit iCloud backup/restore.
 
-[Watch Demo Video](Demo/securescan-pro-demo.mp4)
+[![Watch the SecureScan Pro demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+
+▶️ **Watch Demo on YouTube:** [SecureScan Pro Demo](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
 Demo flow:
 
