@@ -94,7 +94,7 @@ The project includes a short demo video showing the complete SecureScan Pro work
 
 [![Watch the SecureScan Pro demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
-▶️ **Watch Demo on YouTube:** [SecureScan Pro Demo](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+▶️ **Watch Demo on YouTube:** [SecureScan Pro Demo](https://youtube.com/shorts/Ud0FcUpXZe0?feature=share)
 
 Demo flow:
 
