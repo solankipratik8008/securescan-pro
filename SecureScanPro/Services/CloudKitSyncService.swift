@@ -79,11 +79,8 @@ final class CloudKitSyncService {
     func fetchDocuments() async throws -> [ScannedDocument] {
         let query = CKQuery(recordType: recordType, predicate: NSPredicate(value: true))
         
-        // This requires `createdAt` to be marked Sortable in CloudKit Console.
-        query.sortDescriptors = [
-            NSSortDescriptor(key: FieldKey.createdAt, ascending: false)
-        ]
-        
+        // We intentionally do not use CloudKit sort descriptors here.
+        // Sorting is done locally after fetch to avoid CloudKit index issues.
         let result = try await database.records(matching: query)
         var documents: [ScannedDocument] = []
         

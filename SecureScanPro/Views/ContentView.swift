@@ -66,6 +66,9 @@ struct ContentView: View {
                             },
                             onSync: {
                                 viewModel.syncWithICloud()
+                            },
+                            onRestore: {
+                                viewModel.restoreFromICloud()
                             }
                         )
                         

@@ -212,6 +212,29 @@ final class ScanViewModel: ObservableObject {
         }
     }
     
+    func restoreFromICloud() {
+        cloudSyncStatus = .syncing
+        
+        Task {
+            do {
+                let localDocuments = storageService.loadDocuments()
+                let cloudDocuments = try await cloudKitSyncService.fetchDocuments()
+                
+                let mergedDocuments = mergeDocuments(
+                    localDocuments: localDocuments,
+                    cloudDocuments: cloudDocuments
+                )
+                
+                storageService.saveDocuments(mergedDocuments)
+                savedDocuments = mergedDocuments
+                
+                cloudSyncStatus = .synced(Date())
+            } catch {
+                cloudSyncStatus = .failed(makeUserFriendlyCloudErrorMessage(from: error))
+            }
+        }
+    }
+    
     private func mergeDocuments(
         localDocuments: [ScannedDocument],
         cloudDocuments: [ScannedDocument]

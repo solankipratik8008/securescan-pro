@@ -4,7 +4,6 @@
 //
 //  Created by Pratik Solanki on 2026-05-15.
 //
-
 internal import SwiftUI
 
 struct CloudSyncCardView: View {
@@ -12,6 +11,7 @@ struct CloudSyncCardView: View {
     let status: CloudSyncStatus
     let onCheckStatus: () -> Void
     let onSync: () -> Void
+    let onRestore: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -41,29 +41,44 @@ struct CloudSyncCardView: View {
                 }
             }
             
-            HStack(spacing: 12) {
-                Button {
-                    onCheckStatus()
-                } label: {
-                    Label("Check", systemImage: "checkmark.icloud")
-                        .font(.subheadline.bold())
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color(.systemGray5))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+            VStack(spacing: 10) {
+                HStack(spacing: 12) {
+                    Button {
+                        onCheckStatus()
+                    } label: {
+                        Label("Check", systemImage: "checkmark.icloud")
+                            .font(.subheadline.bold())
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Color(.systemGray5))
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(status.isSyncing)
+                    
+                    Button {
+                        onSync()
+                    } label: {
+                        Label("Sync", systemImage: "arrow.triangle.2.circlepath.icloud.fill")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(status.isSyncing ? Color.gray : Color.blue)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                    }
+                    .disabled(status.isSyncing)
                 }
-                .buttonStyle(.plain)
-                .disabled(status.isSyncing)
                 
                 Button {
-                    onSync()
+                    onRestore()
                 } label: {
-                    Label("Sync", systemImage: "arrow.triangle.2.circlepath.icloud.fill")
+                    Label("Restore from iCloud", systemImage: "icloud.and.arrow.down.fill")
                         .font(.subheadline.bold())
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.blue)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(status.isSyncing ? Color.gray : Color.blue)
+                        .background(Color.blue.opacity(0.12))
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
                 .disabled(status.isSyncing)
