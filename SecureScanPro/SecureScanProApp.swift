@@ -5,7 +5,7 @@
 //  Created by Pratik Solanki on 2026-02-27.
 //
 
-import SwiftUI
+internal import SwiftUI
 
 @main
 struct SecureScanProApp: App {

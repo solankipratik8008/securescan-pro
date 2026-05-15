@@ -4,106 +4,172 @@
 //
 //  Created by Pratik Solanki on 2026-02-27.
 //
-import SwiftUI
-import VisionKit
+internal import SwiftUI
 
 struct ContentView: View {
     
-    // MARK: - ViewModel
-    
-    /// StateObject means this view OWNS the lifecycle of the ViewModel.
-    /// SwiftUI keeps it alive as long as ContentView exists.
     @StateObject private var viewModel = ScanViewModel()
-    
-    
-    // MARK: - Navigation State
-    
-    /// This variable controls navigation to the result screen.
-    @State private var showResultScreen = false
-    
+    @State private var selectedDocument: ScannedDocument?
     
     var body: some View {
-        
         NavigationStack {
-            
-            VStack(spacing: 24) {
+            VStack(spacing: 0) {
                 
-                Spacer()
-                
-                // MARK: - App Icon
-                
-                Image(systemName: "doc.text.viewfinder")
-                    .font(.system(size: 80))
-                    .foregroundStyle(.blue)
-                
-                
-                // MARK: - Title
-                
-                Text("SecureScan Pro")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                
-                
-                // MARK: - Description
-                
-                Text("Scan sensitive documents securely with on-device OCR and real-time PII masking.")
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal)
-                
-                
-                Spacer()
-                
-                
-                // MARK: - Scan Button
-                
-                Button {
-                    
-                    /// Ask ViewModel to start scanning
-                    viewModel.startScanning()
-                    
-                } label: {
-                    
-                    Label("Start Secure Scan", systemImage: "camera.fill")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.blue)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 28) {
+                        
+                        // MARK: - Header
+                        
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Home")
+                                .font(.largeTitle.bold())
+                            
+                            HStack(spacing: 14) {
+                                Image(systemName: "doc.viewfinder")
+                                    .font(.system(size: 38, weight: .semibold))
+                                    .foregroundStyle(.blue)
+                                    .frame(width: 64, height: 64)
+                                    .background(Color.blue.opacity(0.12))
+                                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("SecureScan Pro")
+                                        .font(.title2.bold())
+                                    
+                                    Text("On-device OCR with optional privacy masking.")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        
+                        // MARK: - Scan Button
+                        
+                        Button {
+                            viewModel.startScanning()
+                        } label: {
+                            Label("Start Secure Scan", systemImage: "camera.fill")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue)
+                                .clipShape(RoundedRectangle(cornerRadius: 18))
+                        }
+                        
+                        // MARK: - iCloud Sync Card
+
+                        CloudSyncCardView(
+                            status: viewModel.cloudSyncStatus,
+                            onCheckStatus: {
+                                viewModel.checkCloudStatus()
+                            },
+                            onSync: {
+                                viewModel.syncWithICloud()
+                            }
+                        )
+                        
+                        // MARK: - Saved Scans
+                        
+                        VStack(alignment: .leading, spacing: 14) {
+                            HStack {
+                                Text("Saved Scans")
+                                    .font(.title2.bold())
+                                
+                                Spacer()
+                                
+                                Text("\(viewModel.savedDocuments.count)")
+                                    .font(.subheadline.bold())
+                                    .foregroundStyle(.secondary)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color(.systemGray6))
+                                    .clipShape(Capsule())
+                            }
+                            
+                            if viewModel.savedDocuments.isEmpty {
+                                emptyStateView
+                            } else {
+                                searchField
+                                
+                                LazyVStack(spacing: 12) {
+                                    ForEach(viewModel.filteredDocuments) { document in
+                                        Button {
+                                            selectedDocument = document
+                                        } label: {
+                                            SavedScanRow(document: document)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding()
                 }
-                .padding(.horizontal)
-                
-                
-                Spacer()
             }
-            .navigationTitle("Home")
-            
-            
-            // MARK: - Scanner Sheet
-            
-            /// This sheet presents the document scanner.
+            .navigationBarHidden(true)
             .sheet(isPresented: $viewModel.isScannerPresented) {
-                
-                ScannerView { scan in
-                    
-                    /// Process the scanned images
+                ScannerView(onScanCompleted: { scan in
                     viewModel.processScan(scan)
-                    
-                    /// After processing, navigate to result screen
-                    showResultScreen = true
-                }
+                })
             }
-            
-            
-            // MARK: - Navigation Destination
-            
-            /// When showResultScreen becomes true,
-            /// SwiftUI pushes ScanResultView onto the navigation stack.
-            .navigationDestination(isPresented: $showResultScreen) {
-                
+            .navigationDestination(isPresented: Binding(
+                get: { viewModel.hasRecognizedText },
+                set: { isPresented in
+                    if !isPresented {
+                        viewModel.clearCurrentScan()
+                    }
+                }
+            )) {
                 ScanResultView(viewModel: viewModel)
             }
+            .sheet(item: $selectedDocument) { document in
+                NavigationStack {
+                    SavedScanDetailView(viewModel: viewModel, document: document)
+                }
+            }
+            .onAppear {
+                viewModel.loadSavedDocuments()
+                viewModel.checkCloudStatus()
+            }
         }
+    }
+    
+    // MARK: - Empty State
+    
+    private var emptyStateView: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "doc.text.magnifyingglass")
+                .font(.system(size: 42))
+                .foregroundStyle(.secondary)
+            
+            Text("No saved scans yet")
+                .font(.headline)
+            
+            Text("Start a secure scan and save the OCR result to build your scan history.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(28)
+        .background(Color(.systemGray6))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+    
+    // MARK: - Search Field
+    
+    private var searchField: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+            
+            TextField("Search saved scans", text: $viewModel.searchText)
+                .textInputAutocapitalization(.never)
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }

@@ -5,7 +5,7 @@
 //  Created by Pratik Solanki on 2026-03-03.
 //
 
-import SwiftUI          // Needed for SwiftUI views and UIViewControllerRepresentable
+internal import SwiftUI          // Needed for SwiftUI views and UIViewControllerRepresentable
 import VisionKit        // Provides VNDocumentCameraViewController (Apple's document scanner)
 
 /// ScannerView wraps a UIKit controller (VNDocumentCameraViewController)
